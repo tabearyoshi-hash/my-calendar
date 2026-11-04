@@ -55,9 +55,10 @@
         --shadow-drag: 0 10px 28px rgba(20, 24, 32, .26);
         /* 予定色の薄塗りの濃さ（color-mix用）と今日列の薄塗り */
         --ev-mix: 16%;
+        --today: #fa4b2a;
         --today-mix: 12%;
         --today-sel-mix: 24%;
-        --today-tint: rgba(10, 132, 255, .10);
+        --today-tint: rgba(250, 75, 42, .10);
         /* 余白（4の倍数だけ） */
         --space-1: 4px;
         --space-2: 8px;
@@ -107,9 +108,10 @@
           --shadow-pop: 0 8px 30px rgba(0, 0, 0, .45);
           --shadow-drag: 0 10px 28px rgba(0, 0, 0, .5);
           --ev-mix: 26%;
+          --today: #ff7043;
           --today-mix: 18%;
           --today-sel-mix: 32%;
-          --today-tint: rgba(64, 156, 255, .13);
+          --today-tint: rgba(255, 112, 67, .13);
         }
       }
       :root[data-theme="dark"] {
@@ -137,9 +139,10 @@
         --shadow-pop: 0 8px 30px rgba(0, 0, 0, .45);
         --shadow-drag: 0 10px 28px rgba(0, 0, 0, .5);
         --ev-mix: 26%;
+        --today: #ff7043;
         --today-mix: 18%;
         --today-sel-mix: 32%;
-        --today-tint: rgba(64, 156, 255, .13);
+        --today-tint: rgba(255, 112, 67, .13);
       }
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
       html, body { margin: 0; padding: 0; height: 100%; max-width: 100%; overflow: hidden; overscroll-behavior: none; }
@@ -335,13 +338,13 @@
       .cell.dim .dnum { color: var(--text2); font-weight: 400; }
       .cell.sun .dnum { color: var(--sun); }
       .cell.sat .dnum { color: var(--sat); }
-      .cell.today .dnum { background: var(--accent); color: #fff; }
+      .cell.today .dnum { background: var(--today); color: #fff; }
       .cell.selected { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 .5px var(--accent) inset; }
       .cell.drop-hot { background: var(--accent-soft); border-color: var(--accent); }
       /* 今日はセル全体にも薄く色付ける（日付の塗り円と併用）。選択日とは「枠線＋内側の影」で区別し、
          今日かつ選択日のときは一段濃くして両方が分かるようにする */
-      .cell.today { background: rgba(10, 132, 255, .12); background: color-mix(in srgb, var(--accent) var(--today-mix), var(--surface)); }
-      .cell.today.selected { background: rgba(10, 132, 255, .22); background: color-mix(in srgb, var(--accent) var(--today-sel-mix), var(--surface)); }
+      .cell.today { background: rgba(250, 75, 42, .12); background: color-mix(in srgb, var(--today) var(--today-mix), var(--surface)); }
+      .cell.today.selected { background: rgba(250, 75, 42, .22); background: color-mix(in srgb, var(--today) var(--today-sel-mix), var(--surface)); }
       .chip {
         display: flex; align-items: center; gap: 3px;
         font-size: var(--fs-micro); line-height: 1.2; padding: 1px 3px; margin-top: 1px;
@@ -486,7 +489,7 @@
         display: inline-flex; align-items: center; justify-content: center; line-height: 1;
         font-variant-numeric: tabular-nums;
       }
-      .tt-dnum.today { background: var(--accent); color: #fff; }
+      .tt-dnum.today { background: var(--today); color: #fff; }
       .tt-alabel {
         font-size: 8.5px; line-height: 1.25; color: var(--text2); font-weight: 700;
         display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
