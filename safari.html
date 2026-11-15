@@ -672,6 +672,14 @@
         content: "✓"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
         color: #fff; font-size: 13px; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,.4); line-height: 1;
       }
+      /* ツール画面のデフォルト色だけタップ領域を44pxに拡大（見た目の円は30px、余白で確保。予定フォームの色選択には影響しない） */
+      #view-tools .swatches { gap: 4px; flex-wrap: wrap; }
+      #view-tools .swatch { width: 44px; height: 44px; padding: 7px; background-clip: content-box; }
+      #view-tools .swatch.on { box-shadow: none; }
+      #view-tools .swatch.on::before {
+        content: ""; position: absolute; inset: 7px; border-radius: 50%;
+        box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--text);
+      }
       .sheet-actions { display: flex; gap: 8px; margin-top: var(--space-4); }
       .sheet-actions .btn { flex: 1; min-width: 0; min-height: 46px; }
       .move-copy { display: flex; gap: 8px; align-items: center; min-width: 0; }
@@ -885,7 +893,7 @@
 var STORE_KEY = "mycal_safari_store";
 var STORE_VERSION = 1;
 /* アプリの更新日時表示（ツール画面用・日本時間の「YYYY-MM-DD HH:MM」）— 更新のたびにここだけ書き換える */
-var APP_UPDATED = "2026-11-16 03:28";
+var APP_UPDATED = "2026-11-16 03:31";
 var COLORS = ["#e5484d", "#f76b15", "#e5a000", "#30a46c", "#0091ff", "#8e4ec6", "#6e7180"];
 /* ダーク用は同じ色相のまま明度を上げ、彩度を少し落とした別定義（描画時点の実効テーマで選ぶ） */
 var COLORS_DARK = ["#ff7b72", "#ffa25e", "#f5c04a", "#5fd68d", "#5eb2ff", "#c39bf2", "#a7adba"];
