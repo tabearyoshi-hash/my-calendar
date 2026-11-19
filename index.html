@@ -240,13 +240,13 @@
          prefers-reduced-motion 時は下の全体ルールで無効になる */
       main > section:not(.hidden) { animation: view-in .30s ease-out; }
       @keyframes view-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-      /* 月・週の前後移動は、移動方向へ横に滑らせる（次へ＝右から／前へ＝左から流れ込む。0.25秒の穏やかな速さ）
-         クラスは shiftMonth／shiftWeek が描画前に一時的に付け、約300ms後に外す（セクション自体は再描画で消えない）。
-         animation には view-in も並べる：クラスを外したあと view-in だけが残る形にし、
-         月・週移動のたびに画面切替の view-in が再生し直されないようにするため。
+      /* 月・週の前後移動は、日付ブロックだけを移動方向へ横に滑らせる（次へ＝右から／前へ＝左から流れ込む。0.25秒の穏やかな速さ）
+         対象は月表示の #month-grid、週表示の #week-grid と時間割表の日付列エリア（.tt-head／.tt-allday／#tt-days）だけ。
+         見出し・曜日行・時刻ラベル列・下部リストは動かさない。週表示の4要素は同じタイミングで同時に動かし、列の対応をずらさない。
+         クラスは shiftMonth／shiftWeek が描画直後に一時的に付け、約300ms後に外す。
          prefers-reduced-motion 時は下の全体ルール（animation: none !important）で一緒に無効になる */
-      #view-month.slide-next, #view-week.slide-next { animation: view-in .30s ease-out, slide-next .25s ease-out; }
-      #view-month.slide-prev, #view-week.slide-prev { animation: view-in .30s ease-out, slide-prev .25s ease-out; }
+      #month-grid.slide-next, #week-grid.slide-next, .tt-head.slide-next, .tt-allday.slide-next, #tt-days.slide-next { animation: slide-next .25s ease-out; }
+      #month-grid.slide-prev, #week-grid.slide-prev, .tt-head.slide-prev, .tt-allday.slide-prev, #tt-days.slide-prev { animation: slide-prev .25s ease-out; }
       @keyframes slide-next { from { opacity: .9; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
       @keyframes slide-prev { from { opacity: .9; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
 
@@ -906,7 +906,7 @@
 var STORE_KEY = "mycal_safari_store";
 var STORE_VERSION = 1;
 /* アプリの更新日時表示（ツール画面用・日本時間の「YYYY-MM-DD HH:MM」）— 更新のたびにここだけ書き換える */
-var APP_UPDATED = "2026-11-19 03:05";
+var APP_UPDATED = "2026-11-20 03:05";
 var COLORS = ["#e5484d", "#f76b15", "#e5a000", "#30a46c", "#0091ff", "#8e4ec6", "#6e7180"];
 /* ダーク用は同じ色相のまま明度を上げ、彩度を少し落とした別定義（描画時点の実効テーマで選ぶ） */
 var COLORS_DARK = ["#ff7b72", "#ffa25e", "#f5c04a", "#5fd68d", "#5eb2ff", "#c39bf2", "#a7adba"];
@@ -1330,9 +1330,9 @@ function renderMonth() {
     });
   });
 }
-/* 月・週の前後移動に、移動方向へ滑る一過性クラスをセクションへ付ける（n>0＝次へ／n<0＝前へ）。
+/* 月・週の前後移動に、移動方向へ滑る一過性クラスを日付ブロック要素へ付ける（n>0＝次へ／n<0＝前へ）。
    連続で同じ方向へ移動しても毎回再生されるよう、付け直す前にクラスを外してリフローを挟む。
-   クラスは約300ms後に必ず外す（残すと次回の画面切替で view-in より優先されてしまうため） */
+   クラスは約300ms後に必ず外す */
 function slideShift(el, n) {
   if (!el || !n) return;
   el.classList.remove("slide-next", "slide-prev");
@@ -1345,7 +1345,6 @@ function slideShift(el, n) {
   }, 300);
 }
 function shiftMonth(n) {
-  slideShift(document.getElementById("view-month"), n);
   var d = new Date(monthY, monthM + n, 1);
   monthY = d.getFullYear(); monthM = d.getMonth();
   /* ボタン／スワイプ等の明示的な月切替専用の調整：選択日が新しい表示月のグリッド範囲外に
@@ -1358,6 +1357,7 @@ function shiftMonth(n) {
   var gridEndKey = keyOf(new Date(monthY, monthM, 1 - startOffset + 41));
   if (monthSelected < gridStartKey || monthSelected > gridEndKey) monthSelected = keyOf(first);
   renderMonth();
+  slideShift(document.getElementById("month-grid"), n);
 }
 function flashText(txt) {
   var f = document.getElementById("month-flash");
@@ -1557,7 +1557,14 @@ function weekStartOf(k) {
   d.setDate(d.getDate() - off);
   return keyOf(d);
 }
-function shiftWeek(n) { slideShift(document.getElementById("view-week"), n); weekCursor = addDaysKey(weekCursor, n * 7); renderWeek(); }
+function shiftWeek(n) {
+  weekCursor = addDaysKey(weekCursor, n * 7);
+  renderWeek();
+  slideShift(document.getElementById("week-grid"), n);
+  slideShift(document.querySelector("#tt-wrap .tt-head"), n);
+  slideShift(document.querySelector("#tt-wrap .tt-allday"), n);
+  slideShift(document.getElementById("tt-days"), n);
+}
 function weekRangeLabel() {
   var s = parseKey(weekCursor), e = parseKey(addDaysKey(weekCursor, 6));
   return (s.getMonth() + 1) + "月" + s.getDate() + "日〜" + (e.getMonth() + 1) + "月" + e.getDate() + "日";
